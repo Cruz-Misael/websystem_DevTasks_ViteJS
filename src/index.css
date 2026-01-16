@@ -1,0 +1,34 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  height: 100dvh; /* 🔥 viewport real */
+  overflow: hidden;
+}
+
+/* Layout principal */
+.app-container {
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Coluna direita (header + conteúdo) */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* 🔥 ESSENCIAL */
+  overflow: hidden;
+}
+
+/* Área rolável */
+.app-content {
+  flex: 1;
+  min-height: 0; /* 🔥 ESSENCIAL */
+  overflow-y: auto;
+  background-color: #f5f6f8;
+}
