@@ -1,10 +1,17 @@
+
+export type AnalyzedStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "ERROR";
+
 export interface Protocol {
   id: number;
   protocol: number;
   title: string;
   description: string;
 
-  status: "pending" | "processing" | "analyzed" | "error";
+  analyzedStatus?: AnalyzedStatus | null;
 
   devDays?: number;
   workload?: number;
@@ -12,9 +19,7 @@ export interface Protocol {
   supposedEnd?: string;
   supposedStart?: string;
 
-  aiSummary?: string;
-  aiSuggestions?: string[];
-
   createdAt: string;
   updatedAt: string;
 }
+

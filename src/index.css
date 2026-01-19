@@ -5,30 +5,28 @@ body {
 }
 
 #root {
-  height: 100dvh; /* 🔥 viewport real */
+  height: 100dvh; /* viewport real (mobile-safe) */
   overflow: hidden;
 }
 
-/* Layout principal */
 .app-container {
-  height: 100%;
   display: flex;
+  height: 100%;
   overflow: hidden;
 }
 
-/* Coluna direita (header + conteúdo) */
 .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* 🔥 ESSENCIAL */
+  min-height: 0;
   overflow: hidden;
 }
 
-/* Área rolável */
 .app-content {
   flex: 1;
-  min-height: 0; /* 🔥 ESSENCIAL */
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 16px;
   background-color: #f5f6f8;
 }

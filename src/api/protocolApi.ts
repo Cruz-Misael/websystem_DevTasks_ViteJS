@@ -1,9 +1,19 @@
 import { http } from "./http";
 import type { Protocol } from "../types/Protocol";
+import type { AnalyzedStatus } from "../types/Protocol";
 
 export async function getProtocol(protocol: number): Promise<Protocol> {
   const { data } = await http.get(`/protocols/${protocol}`);
   return data;
+}
+
+export async function updateAnalyzedStatus(
+  protocolId: number,
+  analyzedStatus: AnalyzedStatus
+): Promise<void> {
+  await http.put(`/protocols/${protocolId}`, {
+    analyzedStatus,
+  });
 }
 
 export async function updateProtocol(
@@ -18,6 +28,7 @@ export async function analyzeProtocol(protocol: number) {
 }
 
 export async function deleteProtocol(protocol: number) {
+  console.log("DELETE VIA AXIOS", protocol);
   await http.delete(`/protocols/${protocol}`);
 }
 

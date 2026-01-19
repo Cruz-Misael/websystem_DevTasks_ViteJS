@@ -1,38 +1,36 @@
-import type { Protocol } from "../types/Protocol";
+// src/utils/protocolStatus.ts
+import type { AnalyzedStatus } from "../types/Protocol";
 
-export function getStatusUI(protocol: Protocol) {
-  // ERRO explícito
-  if (protocol.status === "error") {
-    return {
-      label: "Erro",
-      color: "error",
-      icon: "⚠️",
-    };
+export function getStatusUI(status?: AnalyzedStatus) {
+  switch (status) {
+    case "PROCESSING":
+      return {
+        label: "Analisando",
+        color: "warning",
+        icon: "🤖",
+        animated: true,
+      };
+
+    case "COMPLETED":
+      return {
+        label: "Completo",
+        color: "success",
+        icon: "✨",
+      };
+
+    case "ERROR":
+      return {
+        label: "Erro",
+        color: "error",
+        icon: "⚠️",
+      };
+
+    case "PENDING":
+    default:
+      return {
+        label: "Pendente",
+        color: "default",
+        icon: "📝",
+      };
   }
-
-  // PROCESSANDO
-  if (protocol.status === "processing") {
-    return {
-      label: "Analisando",
-      color: "warning",
-      icon: "🤖",
-      animated: true,
-    };
-  }
-
-  // ✅ COMPLETO POR REGRA DE NEGÓCIO
-  if (protocol.supposedEnd) {
-    return {
-      label: "Completo",
-      color: "success",
-      icon: "✨",
-    };
-  }
-
-  // PADRÃO
-  return {
-    label: "Pendente",
-    color: "default",
-    icon: "📝",
-  };
 }

@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-
 import type { Protocol } from "../types/Protocol";
-
-import { getStatusUI } from "../utils/protocolStatus";
 
 import {
   fetchProtocols,
   updateProtocol,
   analyzeProtocol,
+  updateAnalyzedStatus,
 } from "../services/protocolService";
 
 import { deleteProtocol } from "../api/protocolApi";
@@ -19,6 +17,7 @@ import { EditProtocolDialog } from "../components/EditProtocolDialog";
 import { DeleteProtocolDialog } from "../components/DeleteProtocolDialog";
 
 type StatusFilter = "pending" | "completed" | "all";
+
 
 export default function Dashboard() {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -32,7 +31,6 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] =
     useState<StatusFilter>("pending");
-
 
   /* =======================
      LOAD INICIAL
@@ -55,27 +53,44 @@ export default function Dashboard() {
   };
 
   const handleSave = async (protocol: Protocol) => {
-    await updateProtocol(protocol);
+    await updateProtocol(protocol.protocol, {
+      title: protocol.title,
+      description: protocol.description,
+      devDays: protocol.devDays,
+      workload: protocol.workload,
+      savings: protocol.savings,
+      supposedStart: protocol.supposedStart,
+      supposedEnd: protocol.supposedEnd,
+    });
+
     setDialogOpen(false);
     loadProtocols();
   };
 
+
   const handleAnalyze = async (protocolId: number) => {
+    // 1️⃣ Atualiza status no banco
+    await updateAnalyzedStatus(protocolId, "PROCESSING");
+
+    // 2️⃣ Atualiza estado local
     setProtocols((prev) =>
       prev.map((p) =>
         p.protocol === protocolId
-          ? { ...p, status: "processing" }
+          ? { ...p, analyzedStatus: "PROCESSING" }
           : p
       )
     );
 
+    // 3️⃣ Chama a IA
     try {
       await analyzeProtocol(protocolId);
     } catch {
+      await updateAnalyzedStatus(protocolId, "ERROR");
+
       setProtocols((prev) =>
         prev.map((p) =>
           p.protocol === protocolId
-            ? { ...p, status: "error" }
+            ? { ...p, analyzedStatus: "ERROR" }
             : p
         )
       );
@@ -109,12 +124,13 @@ export default function Dashboard() {
       title.includes(searchText) ||
       description.includes(searchText);
 
-    const status = getStatusUI(p).label;
+    const isCompleted =
+      p.analyzedStatus === "COMPLETED" || !!p.supposedEnd;
 
     const statusOk =
       statusFilter === "all" ||
-      (statusFilter === "completed" && status === "Completo") ||
-      (statusFilter === "pending" && status === "Pendente");
+      (statusFilter === "completed" && isCompleted) ||
+      (statusFilter === "pending" && !isCompleted);
 
     return textMatch && statusOk;
   });
@@ -123,63 +139,54 @@ export default function Dashboard() {
     await loadProtocols();
   };
 
-
   /* =======================
      RENDER
   ======================= */
   return (
     <Box
       sx={{
-        p: 3,
         height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
       }}
     >
-      {/* PAINEL PRINCIPAL */}
+      {/* HEADER */}
+      <Box>
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          sx={{ color: "#8B2E2E" }}
+        >
+          Protocols
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          General list of registered protocols
+        </Typography>
+      </Box>
+
+      {/* CONTAINER */}
       <Box
         sx={{
-          bgcolor: "#fff",
+          flex: 1,
+          backgroundColor: "#fff",
           borderRadius: 3,
-          p: 3,
+          border: "1px solid #e6e8eb",
           boxShadow: "0 12px 32px rgba(0,0,0,0.06)",
           display: "flex",
           flexDirection: "column",
-          gap: 2.5,
-          height: "100%",
+          overflow: "hidden",
         }}
       >
-        {/* HEADER */}
-        <Box>
-          <Typography
-            variant="h5"
-            fontWeight={700}
-            sx={{ color: "#8B2E2E" }}
-          >
-            Protocolos
-          </Typography>
-
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mt: 0.5 }}
-          >
-            Lista geral de protocolos cadastrados
-          </Typography>
-        </Box>
-
         {/* FILTROS */}
-        <Box
-          sx={{
-            pb: 2,
-            borderBottom: "1px solid #e6e8eb",
-          }}
-        >
-        <ProtocolFilters
-          search={search}
-          onSearchChange={setSearch}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-        />
-
+        <Box sx={{ pb: 2, borderBottom: "1px solid #e6e8eb" }}>
+          <ProtocolFilters
+            search={search}
+            onSearchChange={setSearch}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+          />
         </Box>
 
         {/* TABELA */}
@@ -199,12 +206,12 @@ export default function Dashboard() {
             onEdit={handleEdit}
             onAnalyze={handleAnalyze}
             onDelete={handleDeleteClick}
-            onRefresh={handleRefresh} 
+            onRefresh={handleRefresh}
           />
         </Box>
       </Box>
 
-      {/* DIALOG DELETE */}
+      {/* DELETE */}
       <DeleteProtocolDialog
         open={deleteOpen}
         protocol={selectedProtocol?.protocol}
@@ -213,7 +220,7 @@ export default function Dashboard() {
         onConfirm={handleConfirmDelete}
       />
 
-      {/* DIALOG EDIT */}
+      {/* EDIT */}
       <EditProtocolDialog
         open={dialogOpen}
         protocol={selected}

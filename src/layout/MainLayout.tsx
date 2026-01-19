@@ -8,7 +8,7 @@ export default function MainLayout() {
   return (
     <div className="app-container">
       <Sidebar
-        userName="João Silva"
+        userName="User"
         accessLevel="Admin"
         onNavigate={(path) => navigate(path)}
         onLogout={() => console.log("logout")}

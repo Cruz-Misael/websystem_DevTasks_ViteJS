@@ -4,12 +4,12 @@ import type { Protocol } from "../types/Protocol";
 
 interface Props {
   protocol: Protocol;
+  isProcessing: boolean;
   onAnalyze: (protocolId: number) => void;
 }
 
-export function IAButton({ protocol, onAnalyze }: Props) {
-  const isProcessing = protocol.status === "processing";
 
+export function IAButton({ protocol, isProcessing, onAnalyze }: Props) {
   const handleClick = () => {
     if (!isProcessing) {
       onAnalyze(protocol.protocol);
@@ -29,9 +29,7 @@ export function IAButton({ protocol, onAnalyze }: Props) {
           size="small"
           onClick={handleClick}
           disabled={isProcessing}
-          sx={{
-            color: isProcessing ? "#ff9800" : "#7b61ff",
-          }}
+          sx={{ color: isProcessing ? "#ff9800" : "#7b61ff" }}
         >
           <AutoAwesomeIcon className={isProcessing ? "spin" : ""} />
         </IconButton>
@@ -39,3 +37,4 @@ export function IAButton({ protocol, onAnalyze }: Props) {
     </Tooltip>
   );
 }
+

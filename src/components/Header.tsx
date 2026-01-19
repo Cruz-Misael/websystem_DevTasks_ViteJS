@@ -1,3 +1,5 @@
+import logo from "../assets/logo_personalizado.png"
+
 import {
   Box,
   Typography,
@@ -16,15 +18,15 @@ interface HeaderProps {
 }
 
 export function Header({
-  title = "Gerenciamento de Dashboards",
-  subtitle = "Business Intelligence",
+  title = "Deadline Management Platform",
+  subtitle = "Technology Team",
   userName,
   userEmail,
   accessLevel,
   userPhotoUrl,
-  logoUrl,
+  logoUrl = logo,
 }: HeaderProps) {
-  const displayName = userName || userEmail || "Usuário";
+  const displayName = userName || userEmail || "User";
 
   return (
     <Box
@@ -51,7 +53,7 @@ export function Header({
             src={logoUrl}
             alt="Logo"
             sx={{
-              height: 36,
+              height: 50,
               transition: "transform .2s",
               "&:hover": { transform: "scale(1.05)" },
             }}
@@ -93,7 +95,7 @@ export function Header({
             variant="caption"
             color="text.secondary"
           >
-            BI Platform
+            Devtasks Platform
           </Typography>
         </Box>
 

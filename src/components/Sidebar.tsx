@@ -10,10 +10,10 @@ import {
 } from "@mui/material";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import SettingsIcon from "@mui/icons-material/Settings";
-import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SavingsIcon from "@mui/icons-material/Savings";
+
 
 interface SidebarProps {
   userName: string;
@@ -82,7 +82,7 @@ export default function Sidebar({
       <List sx={{ px: 1, py: 1 }}>
         <SidebarItem
           icon={<DashboardIcon />}
-          label="Meus Dashboards"
+          label="All Protocols"
           active={active === "dashboard"}
           onClick={() => onNavigate("/dashboard")}
         />
@@ -90,17 +90,10 @@ export default function Sidebar({
         {accessLevel === "Admin" && (
           <>
             <SidebarItem
-              icon={<SettingsIcon />}
-              label="Gerenciar Dashboards"
-              active={active === "manage"}
-              onClick={() => onNavigate("/manage")}
-            />
-
-            <SidebarItem
-              icon={<PeopleIcon />}
-              label="Usuários"
-              active={active === "users"}
-              onClick={() => onNavigate("/users")}
+              icon={<SavingsIcon />}
+              label="Savings"
+              active={active === "savings"}
+              onClick={() => onNavigate("/savings")}
             />
 
             <SidebarItem
@@ -132,7 +125,7 @@ export default function Sidebar({
           <ListItemIcon sx={{ color: "#fff" }}>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary="Sair" />
+          <ListItemText primary="Logoff" />
         </ListItemButton>
       </Box>
 

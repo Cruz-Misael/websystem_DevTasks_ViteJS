@@ -15,32 +15,50 @@ export async function fetchProtocols(): Promise<Protocol[]> {
   return response.json();
 }
 
+
 /**
- * Atualiza o campo savings de um protocolo
+ * Atualiza dados do protocolo (edição)
  */
-export async function updateProtocol(protocol: Protocol): Promise<void> {
+export async function updateProtocol(
+  protocolId: number,
+  data: Partial<Protocol>
+): Promise<void> {
   const response = await fetch(
-    `${API_BASE_URL}/protocols/${protocol.protocol}`,
+    `${API_BASE_URL}/protocols/${protocolId}`,
     {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title: protocol.title,
-        description: protocol.description,
-        devDays: protocol.devDays,
-        workload: protocol.workload,
-        savings: protocol.savings,
-        supposedStart: protocol.supposedStart,
-        supposedEnd: protocol.supposedEnd,
-        status: protocol.status,
-      }),
+      body: JSON.stringify(data),
     }
   );
 
   if (!response.ok) {
     throw new Error("Erro ao atualizar protocolo");
+  }
+}
+
+/**
+ * Atualiza SOMENTE o analyzedStatus
+ */
+export async function updateAnalyzedStatus(
+  protocolId: number,
+  analyzedStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "ERROR"
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/protocols/${protocolId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ analyzedStatus }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Erro ao atualizar status");
   }
 }
 

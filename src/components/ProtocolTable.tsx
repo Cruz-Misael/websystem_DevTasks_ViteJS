@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { IAButton } from "./IAButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 import type { Protocol } from "../types/Protocol";
@@ -34,19 +33,19 @@ export function ProtocolTable({
   const columns: GridColDef[] = [
     {
       field: "protocol",
-      headerName: "Protocolo",
+      headerName: "Protocol",
       flex: 1,
       minWidth: 120,
     },
     {
       field: "title",
-      headerName: "Título",
+      headerName: "Title",
       flex: 2,
       minWidth: 220,
     },
     {
       field: "workload",
-      headerName: "Carga",
+      headerName: "Workload (hrs)",
       flex: 1,
       minWidth: 100,
       renderCell: (p) => p.value ?? "—",
@@ -60,72 +59,65 @@ export function ProtocolTable({
     },
     {
       field: "supposedStart",
-      headerName: "Início",
+      headerName: "Start Date",
       flex: 1,
       minWidth: 120,
       renderCell: (p) => p.value ?? "—",
     },
     {
       field: "supposedEnd",
-      headerName: "Entrega",
+      headerName: "End Date",
       flex: 1,
       minWidth: 120,
       renderCell: (p) => p.value ?? "—",
     },
     {
       field: "savings",
-      headerName: "Economia",
+      headerName: "Savings",
       flex: 1,
       minWidth: 120,
       renderCell: (p) => (p.value ? `R$ ${p.value}` : "—"),
     },
 
     // STATUS
-    {
-      field: "status",
-      headerName: "Status",
-      minWidth: 170,
-      sortable: false,
-      renderCell: (p) => {
-        const ui = getStatusUI(p.row);
+ {
+  field: "status",
+  headerName: "Status",
+  minWidth: 170,
+  sortable: false,
+    renderCell: (p) => {
+      const status = p.row.analyzedStatus ?? "PENDING";
 
-        return (
-          <Chip
-            size="small"
-            color={ui.color as any}
-            sx={{ fontWeight: 500, borderRadius: "10px" }}
-            label={
-              <Stack direction="row" spacing={0.6} alignItems="center">
-                <span className={ui.animated ? "pulse" : ""}>
-                  {ui.icon}
-                </span>
-                <span>{ui.label}</span>
+      const ui = getStatusUI(status);
 
-                {p.row.status === "processing" && (
-                  <Tooltip title="IA está analisando">
-                    <AccessTimeIcon fontSize="small" color="warning" />
-                  </Tooltip>
-                )}
-              </Stack>
-            }
-          />
-        );
-      },
-    },
+      return (
+        <Chip
+          size="small"
+          color={ui.color as any}
+          label={ui.label}
+        />
+      );
+    }
 
+  },
     {
       field: "ai",
-      headerName: "IA",
+      headerName: "AI",
       width: 80,
       sortable: false,
       align: "center",
       headerAlign: "center",
-      renderCell: (p) => (
-      <IAButton
-        protocol={p.row}
-        onAnalyze={onAnalyze}
-      />
-      ),
+      renderCell: (p) => {
+        const isProcessing = p.row.analyzedStatus === "PROCESSING";
+
+        return (
+          <IAButton
+            protocol={p.row}
+            isProcessing={isProcessing}
+            onAnalyze={onAnalyze}
+          />
+        );
+      },
     },
 
     // ACTIONS

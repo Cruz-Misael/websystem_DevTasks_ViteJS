@@ -3,7 +3,8 @@ import {
   getProtocol,
   updateProtocol,
   analyzeProtocol,
-  deleteProtocol
+  deleteProtocol,
+  updateAnalyzedStatus,
 } from "../api/protocolApi";
 import type { Protocol } from "../types/Protocol";
 
@@ -34,8 +35,26 @@ export function useProtocol() {
 
   async function analyze() {
     if (!protocol) return;
-    await analyzeProtocol(protocol.protocol);
-    setProtocol({ ...protocol, status: "processing" });
+
+    // 1️⃣ Salva no banco
+    await updateAnalyzedStatus(protocol.protocol, "PROCESSING");
+
+    // 2️⃣ Atualiza estado local
+    setProtocol({
+      ...protocol,
+      analyzedStatus: "PROCESSING",
+    });
+
+    // 3️⃣ Chama IA
+    try {
+      await analyzeProtocol(protocol.protocol);
+    } catch {
+      await updateAnalyzedStatus(protocol.protocol, "ERROR");
+      setProtocol({
+        ...protocol,
+        analyzedStatus: "ERROR",
+      });
+    }
   }
 
   async function remove() {
@@ -51,6 +70,6 @@ export function useProtocol() {
     fetch,
     update,
     analyze,
-    remove
+    remove,
   };
 }
